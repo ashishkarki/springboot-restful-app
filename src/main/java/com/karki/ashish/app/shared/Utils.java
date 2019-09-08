@@ -10,8 +10,6 @@ public class Utils {
 
 	private final Random RANDOM = new SecureRandom();
 	private final String ALPHANUMERIC = "0123456789ABCDEFGHIJKLMNOPQRSTUVWNYZabcdefghijklmnopqrstuvwnyz";
-//	private final int iterations = 10000;
-//	private final int KEY_LENGTH = 256;
 
 	public String generateUserId(int length) {
 		return generateRandomString(length);
