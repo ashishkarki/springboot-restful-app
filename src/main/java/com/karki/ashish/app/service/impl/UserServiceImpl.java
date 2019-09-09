@@ -1,9 +1,13 @@
 package com.karki.ashish.app.service.impl;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,11 +15,13 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.karki.ashish.app.exceptions.UserServiceException;
 import com.karki.ashish.app.io.entity.UserEntity;
 import com.karki.ashish.app.io.repository.UserRepository;
 import com.karki.ashish.app.service.UserService;
 import com.karki.ashish.app.shared.Utils;
 import com.karki.ashish.app.shared.dto.UserDto;
+import com.karki.ashish.app.ui.model.response.ErrorMessages;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -79,12 +85,60 @@ public class UserServiceImpl implements UserService {
 
 		UserEntity foundUserEntity = userRepository.findByUserId(userId);
 		if (null == foundUserEntity) {
-			throw new UsernameNotFoundException(userId);
+			throw new UsernameNotFoundException("User with ID: " + userId + " was not Found!!");
 		}
 
 		BeanUtils.copyProperties(foundUserEntity, foundUserDto);
 
 		return foundUserDto;
+	}
+
+	@Override
+	public UserDto updateUser(String userId, UserDto userDto) {
+		UserEntity foundUserEntity = userRepository.findByUserId(userId);
+		if (null == foundUserEntity) {
+			throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+		}
+
+		// only update the fields specified by the request. might want to check userDto
+		// values.
+		foundUserEntity.setFirstName(userDto.getFirstName());
+		foundUserEntity.setLastName(userDto.getLastName());
+
+		// save changes to DB
+		UserEntity updatedUserEntity = userRepository.save(foundUserEntity);
+
+		UserDto updatedUserDto = new UserDto();
+		BeanUtils.copyProperties(updatedUserEntity, updatedUserDto);
+
+		return updatedUserDto;
+	}
+
+	@Override
+	public void deleteUser(String userId) {
+		UserEntity foundUserEntity = userRepository.findByUserId(userId);
+		if (null == foundUserEntity) {
+			throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+		}
+
+		userRepository.delete(foundUserEntity);
+	}
+
+	@Override
+	public List<UserDto> getUsers(int page, int limit) {
+		List<UserDto> userDtos = new ArrayList<UserDto>();
+
+		Pageable pageable = PageRequest.of(page, limit);
+		Page<UserEntity> usersPage = userRepository.findAll(pageable);
+		List<UserEntity> userEntities = usersPage.getContent();
+
+		for (UserEntity user : userEntities) {
+			UserDto userDto = new UserDto();
+			BeanUtils.copyProperties(user, userDto);
+			userDtos.add(userDto);
+		}
+
+		return userDtos;
 	}
 
 }
