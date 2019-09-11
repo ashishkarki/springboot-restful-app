@@ -3,6 +3,7 @@ package com.karki.ashish.app.ui.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -71,11 +72,15 @@ public class UserController {
 			throw new UserServiceException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());
 		}
 
-		UserDto userDto = new UserDto(); // shared DTO to be sent over to the DB
-		BeanUtils.copyProperties(userDetails, userDto);
+//		UserDto userDto = new UserDto(); // shared DTO to be sent over to the DB
+//		BeanUtils.copyProperties(userDetails, userDto);
+
+		ModelMapper modelMapper = new ModelMapper();
+		UserDto userDto = modelMapper.map(userDetails, UserDto.class);
 
 		UserDto createdUserDto = userService.createUser(userDto); // resulting DTO from DB
-		BeanUtils.copyProperties(createdUserDto, returnValueRest);
+		// BeanUtils.copyProperties(createdUserDto, returnValueRest);
+		returnValueRest = modelMapper.map(createdUserDto, UserRest.class);
 
 		return returnValueRest;
 	}

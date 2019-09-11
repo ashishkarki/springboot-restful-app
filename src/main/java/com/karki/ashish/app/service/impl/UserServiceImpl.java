@@ -3,6 +3,7 @@ package com.karki.ashish.app.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,6 +21,7 @@ import com.karki.ashish.app.io.entity.UserEntity;
 import com.karki.ashish.app.io.repository.UserRepository;
 import com.karki.ashish.app.service.UserService;
 import com.karki.ashish.app.shared.Utils;
+import com.karki.ashish.app.shared.dto.AddressDTO;
 import com.karki.ashish.app.shared.dto.UserDto;
 import com.karki.ashish.app.ui.model.response.ErrorMessages;
 
@@ -41,16 +43,27 @@ public class UserServiceImpl implements UserService {
 			throw new RuntimeException("Record already exists!!");
 		}
 
-		UserEntity userEntity = new UserEntity();
-		BeanUtils.copyProperties(userDto, userEntity);
+		// first fill-up info that connect this userDto to its addresses
+		for (int i = 0; i < userDto.getAddresses().size(); i++) {
+			AddressDTO address = userDto.getAddresses().get(i);
+			address.setUserDetails(userDto);
+			address.setAddressId(utils.generateAddressId(30));
+			
+			userDto.getAddresses().set(i, address);
+		}
+		
+		// UserEntity userEntity = new UserEntity();
+		// BeanUtils.copyProperties(userDto, userEntity);
+		ModelMapper modelMapper = new ModelMapper();
+		UserEntity userEntity = modelMapper.map(userDto, UserEntity.class);
 
 		userEntity.setUserId(utils.generateUserId(30));
 		userEntity.setEncryptedPassword(passwordEncoder.encode(userDto.getPassword()));
 
 		UserEntity storedUserEntity = userRepository.save(userEntity);
 
-		UserDto returnedUserDto = new UserDto();
-		BeanUtils.copyProperties(storedUserEntity, returnedUserDto);
+		UserDto returnedUserDto = modelMapper.map(storedUserEntity, UserDto.class);
+		// BeanUtils.copyProperties(storedUserEntity, returnedUserDto);
 
 		return returnedUserDto;
 	}
