@@ -1,9 +1,11 @@
 package com.karki.ashish.app.ui.controller;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -18,9 +20,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.karki.ashish.app.exceptions.UserServiceException;
+import com.karki.ashish.app.service.AddressService;
 import com.karki.ashish.app.service.UserService;
+import com.karki.ashish.app.shared.dto.AddressDTO;
 import com.karki.ashish.app.shared.dto.UserDto;
 import com.karki.ashish.app.ui.model.request.UserDetailsRequestModel;
+import com.karki.ashish.app.ui.model.response.AddressRestModel;
 import com.karki.ashish.app.ui.model.response.ErrorMessages;
 import com.karki.ashish.app.ui.model.response.OperationStatusModel;
 import com.karki.ashish.app.ui.model.response.RequestOperationNames;
@@ -33,6 +38,9 @@ public class UserController {
 
 	@Autowired
 	UserService userService;
+
+	@Autowired
+	AddressService addressService;
 
 	@GetMapping(path = "/{id}", produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
 	public UserRest getUser(@PathVariable String id) {
@@ -59,6 +67,36 @@ public class UserController {
 		}
 
 		return returnValue;
+	}
+
+	// url to this endpoint would be like:
+	// http://localhost:8080/spring-boot-app/users/<userID>/addresses
+	@GetMapping(path = "/{id}/addresses", produces = { MediaType.APPLICATION_XML_VALUE,
+			MediaType.APPLICATION_JSON_VALUE })
+	public List<AddressRestModel> getUserAddresses(@PathVariable String id) {
+		List<AddressRestModel> addressRestModels = new ArrayList<AddressRestModel>();
+
+		List<AddressDTO> addressDTOs = addressService.getUserAddresses(id);
+
+		if (addressDTOs != null && !addressDTOs.isEmpty()) {
+			// to which type we want to convert
+			Type listType = new TypeToken<List<AddressRestModel>>() {
+			}.getType();
+			addressRestModels = new ModelMapper().map(addressDTOs, listType);
+		}
+
+		return addressRestModels;
+	}
+
+	// url to this endpoint would be like:
+	// http://localhost:8080/spring-boot-app/users/<userID>/addresses/<addressID>
+	@GetMapping(path = "/{userId}/addresses/{addressId}", produces = { MediaType.APPLICATION_XML_VALUE,
+			MediaType.APPLICATION_JSON_VALUE })
+	public AddressRestModel getUserAddress(@PathVariable String userId, @PathVariable String addressId) {
+		// AddressRestModel addressRestModel = new AddressRestModel();
+		AddressDTO addressDTO = addressService.getUserAddress(userId, addressId);
+
+		return new ModelMapper().map(addressDTO, AddressRestModel.class);
 	}
 
 	@PostMapping(consumes = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE }, produces = {
