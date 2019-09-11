@@ -1,6 +1,8 @@
 package com.karki.ashish.app.ui.model.response;
 
-public class AddressRestModel {
+import org.springframework.hateoas.ResourceSupport;
+
+public class AddressRestModel extends ResourceSupport {
 
 	private String addressId; // alphanumeric Id shared back to the user.
 	private String city;

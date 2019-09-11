@@ -66,13 +66,16 @@
 			<artifactId>modelmapper</artifactId>
 			<version>2.3.0</version>
 		</dependency>
-		
-		<!-- comment this out when producing jar file with a tomcat included. war doesn't have app servers. -->
-		<!-- <dependency>
+
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-tomcat</artifactId>
-			<scope>provided</scope>
-		</dependency> -->
+			<artifactId>spring-boot-starter-hateoas</artifactId>
+		</dependency>
+		 
+		<!-- comment this out when producing jar file with a tomcat included. war 
+			doesn't have app servers. -->
+		<!-- <dependency> <groupId>org.springframework.boot</groupId> <artifactId>spring-boot-starter-tomcat</artifactId> 
+			<scope>provided</scope> </dependency> -->
 
 	</dependencies>
 

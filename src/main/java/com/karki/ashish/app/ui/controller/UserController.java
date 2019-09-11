@@ -8,6 +8,7 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Link;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,6 +32,8 @@ import com.karki.ashish.app.ui.model.response.OperationStatusModel;
 import com.karki.ashish.app.ui.model.response.RequestOperationNames;
 import com.karki.ashish.app.ui.model.response.RequestOperationStatuses;
 import com.karki.ashish.app.ui.model.response.UserRest;
+
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
 @RestController
 @RequestMapping("users")
@@ -96,7 +99,16 @@ public class UserController {
 		// AddressRestModel addressRestModel = new AddressRestModel();
 		AddressDTO addressDTO = addressService.getUserAddress(userId, addressId);
 
-		return new ModelMapper().map(addressDTO, AddressRestModel.class);
+		Link addressLink = linkTo(UserController.class).slash(userId).slash("addresses").slash(addressId).withSelfRel();
+		Link allAddressesLink = linkTo(UserController.class).slash(userId).slash("addresses").withRel("addresses");
+		Link userLink = linkTo(UserController.class).slash(userId).withRel("user");
+
+		AddressRestModel addressRestModel = new ModelMapper().map(addressDTO, AddressRestModel.class);
+		addressRestModel.add(addressLink);
+		addressRestModel.add(allAddressesLink);
+		addressRestModel.add(userLink);
+		
+		return addressRestModel;
 	}
 
 	@PostMapping(consumes = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE }, produces = {
