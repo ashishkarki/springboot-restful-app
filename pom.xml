@@ -14,8 +14,8 @@
 	<groupId>com.karki.ashish.app</groupId>
 	<artifactId>mobile-app-ws</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<!-- <packaging>war</packaging> -->
-	<packaging>jar</packaging>
+	<packaging>war</packaging>
+	<!-- <packaging>jar</packaging> -->
 
 	<name>mobile-app-ws</name>
 	<description>Demo project for Spring Boot</description>
@@ -81,8 +81,11 @@
 
 		<!-- comment this out when producing jar file with a tomcat included. war 
 			doesn't have app servers. -->
-		<!-- <dependency> <groupId>org.springframework.boot</groupId> <artifactId>spring-boot-starter-tomcat</artifactId> 
-			<scope>provided</scope> </dependency> -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+			<scope>provided</scope>
+		</dependency>
 
 	</dependencies>
 

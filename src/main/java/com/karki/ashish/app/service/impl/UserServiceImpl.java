@@ -20,6 +20,7 @@ import com.karki.ashish.app.exceptions.UserServiceException;
 import com.karki.ashish.app.io.entity.UserEntity;
 import com.karki.ashish.app.io.repository.UserRepository;
 import com.karki.ashish.app.service.UserService;
+import com.karki.ashish.app.shared.AmazonSES;
 import com.karki.ashish.app.shared.Utils;
 import com.karki.ashish.app.shared.dto.AddressDTO;
 import com.karki.ashish.app.shared.dto.UserDto;
@@ -66,7 +67,9 @@ public class UserServiceImpl implements UserService {
 		UserEntity storedUserEntity = userRepository.save(userEntity);
 
 		UserDto returnedUserDto = modelMapper.map(storedUserEntity, UserDto.class);
-		// BeanUtils.copyProperties(storedUserEntity, returnedUserDto);
+
+		// now that the user is trying to register, send him/her a verification email
+		new AmazonSES().verifyEmail(returnedUserDto);
 
 		return returnedUserDto;
 	}
