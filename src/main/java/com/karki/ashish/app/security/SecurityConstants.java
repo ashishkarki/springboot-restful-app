@@ -16,6 +16,7 @@ public class SecurityConstants {
 	public static final String TOKEN_PREFIX = "Bearer ";
 	public static final String HEADER_STRING = "Authorization";
 	public static final String SIGN_UP_URL = "/users";
+	public static final String VERIFICATION_URL = "/users/email-verification";
 
 	/**
 	 * Since securityConstants class isn't a spring component, we cannot autowire appProperties as a Bean

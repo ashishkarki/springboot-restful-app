@@ -1,5 +1,8 @@
 package com.karki.ashish.app.ui.controller;
 
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,12 +34,9 @@ import com.karki.ashish.app.ui.model.request.UserDetailsRequestModel;
 import com.karki.ashish.app.ui.model.response.AddressRestModel;
 import com.karki.ashish.app.ui.model.response.ErrorMessages;
 import com.karki.ashish.app.ui.model.response.OperationStatusModel;
-import com.karki.ashish.app.ui.model.response.RequestOperationNames;
-import com.karki.ashish.app.ui.model.response.RequestOperationStatuses;
+import com.karki.ashish.app.ui.model.response.RequestOperationName;
+import com.karki.ashish.app.ui.model.response.RequestOperationStatus;
 import com.karki.ashish.app.ui.model.response.UserRest;
-
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/users")
@@ -161,12 +161,33 @@ public class UserController {
 	public OperationStatusModel deleteUser(@PathVariable String id) {
 		OperationStatusModel returnedModel = new OperationStatusModel();
 
-		returnedModel.setOperationName(RequestOperationNames.DELETE.name());
+		returnedModel.setOperationName(RequestOperationName.DELETE.name());
 
 		userService.deleteUser(id);
 
-		returnedModel.setOperationResult(RequestOperationStatuses.SUCCESS.name());
+		returnedModel.setOperationResult(RequestOperationStatus.SUCCESS.name());
 
 		return returnedModel;
+	}
+
+	/*
+	 * http://localhost:8080/spring-boot-app/users/email-verification?token=sdfsdf
+	 */
+	@GetMapping(path = "/email-verification", produces = { MediaType.APPLICATION_JSON_VALUE,
+			MediaType.APPLICATION_XML_VALUE })
+	public OperationStatusModel verifyEmailToken(@RequestParam(value = "token") String token) {
+
+		OperationStatusModel returnValue = new OperationStatusModel();
+		returnValue.setOperationName(RequestOperationName.VERIFY_EMAIL.name());
+
+		boolean isVerified = userService.verifyEmailToken(token);
+
+		if (isVerified) {
+			returnValue.setOperationResult(RequestOperationStatus.SUCCESS.name());
+		} else {
+			returnValue.setOperationResult(RequestOperationStatus.ERROR.name());
+		}
+
+		return returnValue;
 	}
 }

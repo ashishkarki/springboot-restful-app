@@ -48,17 +48,20 @@ public class UserServiceImpl implements UserService {
 			AddressDTO address = userDto.getAddresses().get(i);
 			address.setUserDetails(userDto);
 			address.setAddressId(utils.generateAddressId(30));
-			
+
 			userDto.getAddresses().set(i, address);
 		}
-		
+
 		// UserEntity userEntity = new UserEntity();
 		// BeanUtils.copyProperties(userDto, userEntity);
 		ModelMapper modelMapper = new ModelMapper();
 		UserEntity userEntity = modelMapper.map(userDto, UserEntity.class);
 
-		userEntity.setUserId(utils.generateUserId(30));
+		final String publicUserId = utils.generateUserId(30);
+		userEntity.setUserId(publicUserId);
 		userEntity.setEncryptedPassword(passwordEncoder.encode(userDto.getPassword()));
+		userEntity.setEmailVerificationToken(utils.generateEmailVerificationToken(publicUserId));
+		userEntity.setEmailVerificationStatus(false);
 
 		UserEntity storedUserEntity = userRepository.save(userEntity);
 
@@ -75,8 +78,11 @@ public class UserServiceImpl implements UserService {
 		if (foundUserEntity == null)
 			throw new UsernameNotFoundException(email);
 
+//		return new User(foundUserEntity.getEmail(), foundUserEntity.getEncryptedPassword(),
+//				new ArrayList<GrantedAuthority>());
+
 		return new User(foundUserEntity.getEmail(), foundUserEntity.getEncryptedPassword(),
-				new ArrayList<GrantedAuthority>());
+				foundUserEntity.getEmailVerificationStatus(), true, true, true, new ArrayList<GrantedAuthority>());
 	}
 
 	@Override
@@ -152,6 +158,26 @@ public class UserServiceImpl implements UserService {
 		}
 
 		return userDtos;
+	}
+
+	@Override
+	public boolean verifyEmailToken(String token) {
+		boolean returnValue = false;
+
+		// Find user by token
+		UserEntity userEntity = userRepository.findUserByEmailVerificationToken(token);
+
+		if (userEntity != null) {
+			boolean hastokenExpired = Utils.hasTokenExpired(token);
+			if (!hastokenExpired) {
+				userEntity.setEmailVerificationToken(null);
+				userEntity.setEmailVerificationStatus(Boolean.TRUE);
+				userRepository.save(userEntity);
+				returnValue = true;
+			}
+		}
+
+		return returnValue;
 	}
 
 }
