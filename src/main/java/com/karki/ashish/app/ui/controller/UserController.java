@@ -9,6 +9,8 @@ import org.modelmapper.TypeToken;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
+import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.Resources;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,9 +36,10 @@ import com.karki.ashish.app.ui.model.response.RequestOperationStatuses;
 import com.karki.ashish.app.ui.model.response.UserRest;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RestController
-@RequestMapping("users")
+@RequestMapping("/users")
 public class UserController {
 
 	@Autowired
@@ -75,8 +78,8 @@ public class UserController {
 	// url to this endpoint would be like:
 	// http://localhost:8080/spring-boot-app/users/<userID>/addresses
 	@GetMapping(path = "/{id}/addresses", produces = { MediaType.APPLICATION_XML_VALUE,
-			MediaType.APPLICATION_JSON_VALUE })
-	public List<AddressRestModel> getUserAddresses(@PathVariable String id) {
+			MediaType.APPLICATION_JSON_VALUE, "application/hal+json" })
+	public Resources<AddressRestModel> getUserAddresses(@PathVariable String id) {
 		List<AddressRestModel> addressRestModels = new ArrayList<AddressRestModel>();
 
 		List<AddressDTO> addressDTOs = addressService.getUserAddresses(id);
@@ -86,29 +89,37 @@ public class UserController {
 			Type listType = new TypeToken<List<AddressRestModel>>() {
 			}.getType();
 			addressRestModels = new ModelMapper().map(addressDTOs, listType);
+
+			addressRestModels.forEach(addressRest -> {
+				Link addressLink = linkTo(methodOn(UserController.class).getUserAddress(id, addressRest.getAddressId()))
+						.withSelfRel();
+				Link userLink = linkTo(methodOn(UserController.class).getUser(id)).withRel("user");
+
+				addressRest.add(addressLink);
+				addressRest.add(userLink);
+			});
 		}
 
-		return addressRestModels;
+		return new Resources<>(addressRestModels);
 	}
 
 	// url to this endpoint would be like:
 	// http://localhost:8080/spring-boot-app/users/<userID>/addresses/<addressID>
 	@GetMapping(path = "/{userId}/addresses/{addressId}", produces = { MediaType.APPLICATION_XML_VALUE,
-			MediaType.APPLICATION_JSON_VALUE })
-	public AddressRestModel getUserAddress(@PathVariable String userId, @PathVariable String addressId) {
-		// AddressRestModel addressRestModel = new AddressRestModel();
+			MediaType.APPLICATION_JSON_VALUE, "application/hal+json" })
+	public Resource<AddressRestModel> getUserAddress(@PathVariable String userId, @PathVariable String addressId) {
 		AddressDTO addressDTO = addressService.getUserAddress(userId, addressId);
 
-		Link addressLink = linkTo(UserController.class).slash(userId).slash("addresses").slash(addressId).withSelfRel();
-		Link allAddressesLink = linkTo(UserController.class).slash(userId).slash("addresses").withRel("addresses");
+		Link addressLink = linkTo(methodOn(UserController.class).getUserAddress(userId, addressId)).withSelfRel();
+		Link allAddressesLink = linkTo(methodOn(UserController.class).getUserAddresses(userId)).withRel("addresses");
 		Link userLink = linkTo(UserController.class).slash(userId).withRel("user");
 
 		AddressRestModel addressRestModel = new ModelMapper().map(addressDTO, AddressRestModel.class);
 		addressRestModel.add(addressLink);
 		addressRestModel.add(allAddressesLink);
 		addressRestModel.add(userLink);
-		
-		return addressRestModel;
+
+		return new Resource<>(addressRestModel);
 	}
 
 	@PostMapping(consumes = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE }, produces = {
@@ -122,14 +133,10 @@ public class UserController {
 			throw new UserServiceException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());
 		}
 
-//		UserDto userDto = new UserDto(); // shared DTO to be sent over to the DB
-//		BeanUtils.copyProperties(userDetails, userDto);
-
 		ModelMapper modelMapper = new ModelMapper();
 		UserDto userDto = modelMapper.map(userDetails, UserDto.class);
 
 		UserDto createdUserDto = userService.createUser(userDto); // resulting DTO from DB
-		// BeanUtils.copyProperties(createdUserDto, returnValueRest);
 		returnValueRest = modelMapper.map(createdUserDto, UserRest.class);
 
 		return returnValueRest;
