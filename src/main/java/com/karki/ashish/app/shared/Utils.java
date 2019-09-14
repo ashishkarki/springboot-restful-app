@@ -12,6 +12,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.SignatureException;
 
 @Component
 public class Utils {
@@ -37,7 +38,7 @@ public class Utils {
 		return new String(returnValue);
 	}
 
-	public static boolean hasTokenExpired(String token) {
+	public boolean hasTokenExpired(String token) {
 		boolean returnValue = false;
 
 		try {
@@ -49,6 +50,8 @@ public class Utils {
 
 			returnValue = tokenExpirationDate.before(todayDate);
 		} catch (ExpiredJwtException ex) {
+			returnValue = true;
+		} catch (SignatureException signatureException) {
 			returnValue = true;
 		}
 

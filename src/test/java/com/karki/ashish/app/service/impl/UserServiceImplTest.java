@@ -118,7 +118,7 @@ class UserServiceImplTest {
 		assertEquals(fakeUserEntity.getAddresses().size(), testReturnedDto.getAddresses().size());
 
 		// TODO this could be it's own test
-		verify(utils, times(fakeUserDto.getAddresses().size())).generateAddressId(30);
+		verify(utils, times(fakeUserDto.getAddresses().size())).generateAddressId(TestingUtils.fakeIdLength);
 		verify(passwordEncoder, times(1)).encode(fakeUserDto.getPassword());
 		verify(userRepository, times(1)).save(any(UserEntity.class));
 	}

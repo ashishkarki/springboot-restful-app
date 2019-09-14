@@ -32,6 +32,7 @@ public class TestingUtils {
 	public final static String fakeCountry = "SomeCountry";
 	public final static String fakeStreet = "SomeStreet";
 	public final static String fakePostalCode = "545637";
+	public final static int fakeIdLength = 30;
 
 	static UserEntity fakeUserEntity;
 	static AddressDTO fakeBillingAddressDto;

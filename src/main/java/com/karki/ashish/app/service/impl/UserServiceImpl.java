@@ -37,7 +37,7 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	BCryptPasswordEncoder passwordEncoder;
-	
+
 	@Autowired
 	AmazonSES amazonSES;
 
@@ -174,7 +174,7 @@ public class UserServiceImpl implements UserService {
 		UserEntity userEntity = userRepository.findUserByEmailVerificationToken(token);
 
 		if (userEntity != null) {
-			boolean hastokenExpired = Utils.hasTokenExpired(token);
+			boolean hastokenExpired = utils.hasTokenExpired(token);
 			if (!hastokenExpired) {
 				userEntity.setEmailVerificationToken(null);
 				userEntity.setEmailVerificationStatus(Boolean.TRUE);
