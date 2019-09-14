@@ -37,6 +37,9 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	BCryptPasswordEncoder passwordEncoder;
+	
+	@Autowired
+	AmazonSES amazonSES;
 
 	@Override
 	public UserDto createUser(UserDto userDto) {
@@ -69,7 +72,7 @@ public class UserServiceImpl implements UserService {
 		UserDto returnedUserDto = modelMapper.map(storedUserEntity, UserDto.class);
 
 		// now that the user is trying to register, send him/her a verification email
-		new AmazonSES().verifyEmail(returnedUserDto);
+		amazonSES.verifyEmail(returnedUserDto);
 
 		return returnedUserDto;
 	}
