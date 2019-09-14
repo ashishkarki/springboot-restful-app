@@ -72,7 +72,7 @@ public class UserServiceImpl implements UserService {
 		UserDto returnedUserDto = modelMapper.map(storedUserEntity, UserDto.class);
 
 		// now that the user is trying to register, send him/her a verification email
-		amazonSES.verifyEmail(returnedUserDto);
+		// // amazonSES.verifyEmail(returnedUserDto); 
 
 		return returnedUserDto;
 	}
@@ -83,9 +83,6 @@ public class UserServiceImpl implements UserService {
 
 		if (foundUserEntity == null)
 			throw new UsernameNotFoundException(email);
-
-//		return new User(foundUserEntity.getEmail(), foundUserEntity.getEncryptedPassword(),
-//				new ArrayList<GrantedAuthority>());
 
 		return new User(foundUserEntity.getEmail(), foundUserEntity.getEncryptedPassword(),
 				foundUserEntity.getEmailVerificationStatus(), true, true, true, new ArrayList<GrantedAuthority>());

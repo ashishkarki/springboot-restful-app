@@ -28,9 +28,14 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 				.permitAll()
 				.antMatchers(HttpMethod.GET, SecurityConstants.VERIFICATION_URL)
 				.permitAll()
+				.antMatchers(SecurityConstants.H2_CONSOLE)
+				.permitAll()
 				.anyRequest().authenticated().and().addFilter(getAuthenticationFilter())
 				.addFilter(new AuthorizationFilter(authenticationManager()))
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+		
+		// only used temporarily to allow h2-console to be loaded in the browser. Comment out otherwise.
+		http.headers().frameOptions().disable();
 	}
 
 	@Override
