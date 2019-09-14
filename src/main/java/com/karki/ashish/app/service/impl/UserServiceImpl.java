@@ -44,7 +44,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public UserDto createUser(UserDto userDto) {
 		if (userRepository.findByEmail(userDto.getEmail()) != null) {
-			throw new RuntimeException("Record already exists!!");
+			throw new UserServiceException("Record already exists!!");
 		}
 
 		// first fill-up info that connect this userDto to its addresses

@@ -7,13 +7,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.catalina.mapper.Mapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -24,6 +25,7 @@ import org.modelmapper.TypeToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import com.karki.ashish.app.exceptions.UserServiceException;
 import com.karki.ashish.app.io.entity.AddressEntity;
 import com.karki.ashish.app.io.entity.UserEntity;
 import com.karki.ashish.app.io.repository.UserRepository;
@@ -50,6 +52,7 @@ class UserServiceImplTest {
 	AmazonSES amazonSES;
 
 	final String fakeUserId = "78uyiy6rt";
+	final String fakePassword = "HsqUI67T";
 	final String fakeEncryptedPassword = "kfjf&3545m#!";
 	final String fakeEmailVerificationToken = "jldkasfjlkj934870934ldkfjsdldkfjlksdjf";
 	final String fakeAddressId = "67tryncjd54";
@@ -105,6 +108,15 @@ class UserServiceImplTest {
 	}
 
 	@Test
+	final void testCreateUser_throws_UserServiceException() {
+		when(userRepository.findByEmail(anyString())).thenReturn(fakeUserEntity); // anything but null
+
+		assertThrows(UserServiceException.class, () -> {
+			testUserService.createUser(fakeUserDto);
+		});
+	}
+
+	@Test
 	final void testCreateUser() {
 		final String fakeAlphaNumber = "23jhfkf9o";
 		// setup
@@ -125,6 +137,11 @@ class UserServiceImplTest {
 		assertEquals(fakeUserEntity.getLastName(), testReturnedDto.getLastName());
 		assertEquals(fakeUserId, testReturnedDto.getUserId());
 		assertEquals(fakeUserEntity.getAddresses().size(), testReturnedDto.getAddresses().size());
+
+		// TODO this could be it's own test
+		verify(utils, times(fakeUserDto.getAddresses().size())).generateAddressId(30);
+		verify(passwordEncoder, times(1)).encode(fakeUserDto.getPassword());
+		verify(userRepository, times(1)).save(any(UserEntity.class));
 	}
 
 	private void setupFakeAddressDTOs() {
@@ -177,5 +194,6 @@ class UserServiceImplTest {
 		}.getType();
 
 		fakeUserDto = modelMapper.map(fakeUserEntity, listType);
+		fakeUserDto.setPassword(fakePassword); // only DTO has this property
 	}
 }
