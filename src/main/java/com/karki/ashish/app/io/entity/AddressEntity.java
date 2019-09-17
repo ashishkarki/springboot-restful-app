@@ -9,6 +9,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity(name = "addresses")
 public class AddressEntity implements Serializable {
 
@@ -41,6 +43,7 @@ public class AddressEntity implements Serializable {
 
 	@ManyToOne
 	@JoinColumn(name = "users_id") // name-of-primary-table_name-of-primary-key-in-primary-table
+	@JsonIgnore // so that user object isn't nested in addresses array
 	private UserEntity userDetails;
 
 	public long getId() {
