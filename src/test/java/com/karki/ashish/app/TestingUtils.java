@@ -48,6 +48,12 @@ public class TestingUtils {
 		return fakeEmail + random.nextInt();
 	}
 
+	public static String getRandomFakeUserId() {
+		Random random = new Random();
+
+		return fakeUserId + random.nextInt();
+	}
+
 	public static List<AddressDTO> getFakeAddressDTOs() {
 		fakeBillingAddressDto = new AddressDTO();
 		fakeBillingAddressDto.setAddressId(fakeAddressId);
