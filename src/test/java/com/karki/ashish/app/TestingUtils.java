@@ -3,6 +3,7 @@ package com.karki.ashish.app;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -40,6 +41,12 @@ public class TestingUtils {
 	static List<AddressDTO> fakeAddressDtoList;
 	static List<AddressEntity> fakeAddressEntityList;
 	static UserDto fakeUserDto;
+
+	public static String getRandomFakeEmail() {
+		Random random = new Random();
+
+		return fakeEmail + random.nextInt();
+	}
 
 	public static List<AddressDTO> getFakeAddressDTOs() {
 		fakeBillingAddressDto = new AddressDTO();
@@ -86,7 +93,7 @@ public class TestingUtils {
 		fakeUserEntity.setLastName(fakeLastName);
 		fakeUserEntity.setUserId(fakeUserId);
 		fakeUserEntity.setEncryptedPassword(fakeEncryptedPassword);
-		fakeUserEntity.setEmail(fakeEmail);
+		fakeUserEntity.setEmail(getRandomFakeEmail());
 		fakeUserEntity.setEmailVerificationToken(fakeEmailVerificationToken);
 
 		if (fakeAddressEntityList == null) {
