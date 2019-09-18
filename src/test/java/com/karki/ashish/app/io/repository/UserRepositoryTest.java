@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -162,6 +163,39 @@ class UserRepositoryTest {
 		final boolean newStatus = false;
 
 		testUserRepository.updateUserEmailVerificationStatus(newStatus, userEntity1.getUserId());
+
+		UserEntity storedUserEntity = testUserRepository.findByUserId(userEntity1.getUserId());
+
+		assertTrue(storedUserEntity.getEmailVerificationStatus() == newStatus);
+	}
+
+	@Test
+	final void testFindUserEntityByUserId() {
+		UserEntity userEntity = testUserRepository.findUserEntityByUserId(userEntity1.getUserId());
+
+		assertNotNull(userEntity);
+		assertEquals(userEntity1.getUserId(), userEntity.getUserId());
+	}
+
+	@Test
+	final void testFindUserFullNameById() {
+		List<Object[]> userFullName = testUserRepository.findUserFullNameById(userEntity1.getUserId());
+
+		assertNotNull(userFullName);
+		assertTrue(userFullName.size() == 1);
+
+		final String fName = (String) userFullName.get(0)[0];
+		final String lName = (String) userFullName.get(0)[1];
+
+		assertNotNull(fName);
+		assertNotNull(lName);
+	}
+
+	@Test
+	final void testUpdateUserEntityEmailVerificationStatus() {
+		final boolean newStatus = false;
+
+		testUserRepository.updateUserEntityEmailVerificationStatus(newStatus, userEntity1.getUserId());
 
 		UserEntity storedUserEntity = testUserRepository.findByUserId(userEntity1.getUserId());
 

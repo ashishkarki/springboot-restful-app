@@ -9,8 +9,10 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
-@Entity(name = "users")
+@Entity
+@Table(name = "users")
 public class UserEntity implements Serializable {
 
 	/**
@@ -41,7 +43,7 @@ public class UserEntity implements Serializable {
 
 	@Column(nullable = false)
 	private Boolean emailVerificationStatus = false;
-	
+
 	@OneToMany(mappedBy = "userDetails", cascade = CascadeType.ALL)
 	List<AddressEntity> addresses;
 
