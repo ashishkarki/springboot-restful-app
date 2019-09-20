@@ -72,7 +72,7 @@ public class UserServiceImpl implements UserService {
 		UserDto returnedUserDto = modelMapper.map(storedUserEntity, UserDto.class);
 
 		// now that the user is trying to register, send him/her a verification email
-		amazonSES.verifyEmail(returnedUserDto);
+		//amazonSES.verifyEmail(returnedUserDto);
 
 		return returnedUserDto;
 	}

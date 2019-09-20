@@ -38,6 +38,9 @@ import com.karki.ashish.app.ui.model.response.RequestOperationName;
 import com.karki.ashish.app.ui.model.response.RequestOperationStatus;
 import com.karki.ashish.app.ui.model.response.UserRest;
 
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+
 @RestController
 @RequestMapping("/users")
 // //@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:8090"})
@@ -59,6 +62,8 @@ public class UserController {
 		return returnValueRest;
 	}
 
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "authorization", value = "${userController.authorizationHeader.description}", paramType = "header") })
 	@GetMapping(produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
 	public List<UserRest> getUsers(@RequestParam(value = "page", defaultValue = "1") int page,
 			@RequestParam(value = "limit", defaultValue = "25") int limit) {
