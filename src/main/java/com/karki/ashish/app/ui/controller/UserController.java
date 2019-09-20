@@ -40,6 +40,7 @@ import com.karki.ashish.app.ui.model.response.UserRest;
 
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 
 @RestController
 @RequestMapping("/users")
@@ -62,6 +63,7 @@ public class UserController {
 		return returnValueRest;
 	}
 
+	@ApiOperation(value = "Get a list of current users", notes = "${userController.GetUser.ApiOperation.note}")
 	@ApiImplicitParams({
 			@ApiImplicitParam(name = "authorization", value = "${userController.authorizationHeader.description}", paramType = "header") })
 	@GetMapping(produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })

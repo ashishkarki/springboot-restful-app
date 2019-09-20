@@ -27,7 +27,8 @@ public class SwaggerConfig {
 	            "a@b.com"
 	    );
 	    
-	    List<VendorExtension> vendorExtensions = new ArrayList<>();
+	    @SuppressWarnings("rawtypes")
+		List<VendorExtension> vendorExtensions = new ArrayList<>();
 		
 		ApiInfo apiInfo = new ApiInfo(
 				"Spring boot app RESTful Web Service documentation",
