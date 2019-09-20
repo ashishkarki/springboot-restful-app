@@ -40,6 +40,7 @@ import com.karki.ashish.app.ui.model.response.UserRest;
 
 @RestController
 @RequestMapping("/users")
+// //@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:8090"})
 public class UserController {
 
 	@Autowired
@@ -175,6 +176,7 @@ public class UserController {
 	 */
 	@GetMapping(path = "/email-verification", produces = { MediaType.APPLICATION_JSON_VALUE,
 			MediaType.APPLICATION_XML_VALUE })
+	// // @CrossOrigin(origins = {"http://localhost:8080", "http://localhost:8090"})
 	public OperationStatusModel verifyEmailToken(@RequestParam(value = "token") String token) {
 
 		OperationStatusModel returnValue = new OperationStatusModel();
